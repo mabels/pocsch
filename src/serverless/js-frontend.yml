@@ -1,0 +1,15 @@
+
+service: TBD
+
+plugins:
+  - serverless-finch
+
+provider:
+  name: aws
+  region: eu-west-1
+  runtime: nodejs6.10
+
+custom:
+  client:
+    distributionFolder: ../js-frontend
+    bucketName: TBD
