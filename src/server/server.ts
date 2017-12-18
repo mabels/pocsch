@@ -49,13 +49,14 @@ function starter(): void {
 
   const app = express();
 
-  app.use(express.static(path.join(process.cwd(), 'dist/js-frontend')));
 
-  app.get('/', (req: express.Request, res: express.Response) => res.redirect('/index.html'));
   app.get('/service-map.json', new ServiceMapService().handle);
   app.get('/car-list', new CarListService().handle);
   app.get('/user-info', new UserInfoService().handle);
   app.get('/service-list', new ServiceListService().handle);
+
+  app.use(express.static(path.join(process.cwd(), 'dist/js-frontend')));
+  app.get('/', (req: express.Request, res: express.Response) => res.redirect('/index.html'));
 
   httpServer.on('request', app);
   httpServer.listen(applicationPort);

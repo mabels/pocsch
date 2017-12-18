@@ -45,9 +45,9 @@ export default class Home extends React.Component<HomeProps, HomeState> {
                   <li>{this.props.auth.idToken}</li>
                   <li>{this.props.auth.expiresAt}</li>
                   </ul>
-                  <ServiceDump auth={this.props.auth} serviceMap={this.props.serviceMap} serviceName="carList" />
-                  <ServiceDump auth={this.props.auth} serviceMap={this.props.serviceMap} serviceName="userInfo" />
-                  <ServiceDump auth={this.props.auth} serviceMap={this.props.serviceMap} serviceName="serviceList" />
+                  <ServiceDump auth={this.props.auth} serviceMap={this.props.serviceMap} serviceName="car-list" />
+                  <ServiceDump auth={this.props.auth} serviceMap={this.props.serviceMap} serviceName="user-info" />
+                  <ServiceDump auth={this.props.auth} serviceMap={this.props.serviceMap} serviceName="service-list" />
                 </div>
                 )
             }
