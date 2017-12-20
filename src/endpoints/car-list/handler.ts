@@ -1,4 +1,3 @@
-import AwsBinding from '../aws-binding';
 
 export default class Handler {
   constructor() {
@@ -13,4 +12,5 @@ export default class Handler {
   }
 }
 
+import AwsBinding from '../aws-binding';
 module.exports.action = AwsBinding(new Handler());

@@ -22,16 +22,16 @@ export default class ServiceMap {
     }
     axios.get('/service-map.json')
       .then((response) => {
-        console.log('0-loaded service-map', response.data, this);
+        // console.log('0-loaded service-map', response.data, this);
         this.serviceMap = response.data;
         try {
           this.loaded = true;
-          console.log('2-loaded service-map', response.data, this);
+          // console.log('2-loaded service-map', response.data, this);
         } catch (e) {
-          console.log('e-loaded service-map', response.data, this);
+          // console.log('e-loaded service-map', response.data, this);
           console.error(e);
         }
-        console.log('1-loaded service-map', response.data, this);
+        // console.log('1-loaded service-map', response.data, this);
       })
       .catch((error) => {
         console.log(error);
