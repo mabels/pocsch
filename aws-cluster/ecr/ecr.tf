@@ -2,8 +2,8 @@
 variable "ecr_repros" {
   type = "list"
   default = [ 
-    { name = "ecr" },
-    { name = "ecr1" } 
+    { name = "pocsch" },
+#    { name = "ecr1" } 
   ] 
 }
 
