@@ -2,7 +2,7 @@ FROM node:boron
 
 COPY tsconfig.json tslint.json package.json /app/
 COPY test /app/test
-COPY lib /app/lib
+COPY src /app/src
 RUN cd app && \
   ls -l && \
   npm install && \
