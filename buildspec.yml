@@ -4,9 +4,9 @@ phases:
   install:
     commands:
       - env
-      - echo Logging in to Amazon ECR...
+      - echo Building POCSCH Docker to Amazon ECR...
       - aws --version
-      - $(aws ecr get-login --region $AWS_DEFAULT_REGION)
+      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
       - REPOSITORY_URI=973800055156.dkr.ecr.eu-west-1.amazonaws.com/pocsch
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
 
