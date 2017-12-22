@@ -1,6 +1,6 @@
 FROM node:boron
 
-COPY tsconfig.json tslint.json package.json /app/
+COPY webpack.config.js tsconfig.json tslint.json package.json /app/
 COPY test /app/test
 COPY src /app/src
 RUN cd app && \
