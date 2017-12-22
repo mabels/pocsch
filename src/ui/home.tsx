@@ -3,7 +3,7 @@ import { Navbar, Button } from 'react-bootstrap';
 import Auth from '../model/auth';
 import ServiceMap from '../model/service-map';
 import { observer } from 'mobx-react';
-import { observable } from 'mobx';
+// import { observable } from 'mobx';
 
 import ServiceDump from './components/service-dump';
 

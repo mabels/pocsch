@@ -1,6 +1,6 @@
 import { WebAuth, Auth0DecodedHash } from 'auth0-js';
 import { computed, observable } from 'mobx';
-import { clearTimeout } from 'timers';
+// import { clearTimeout } from 'timers';
 
 export default class Auth {
 

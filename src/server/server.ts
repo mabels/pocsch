@@ -49,7 +49,6 @@ function starter(): void {
 
   const app = express();
 
-
   app.get('/service-map.json', new ServiceMapService().handle);
   app.get('/car-list', new CarListService().handle);
   app.get('/user-info', new UserInfoService().handle);

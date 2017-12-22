@@ -1,6 +1,6 @@
-import { computed, observable, action, observe } from 'mobx';
+import { observable, observe } from 'mobx';
 import Auth from '../model/auth';
-import { clearTimeout } from 'timers';
+// import { clearTimeout } from 'timers';
 import axios, { AxiosPromise } from 'axios';
 import { IValueDidChange } from 'mobx/lib/types/observablevalue';
 

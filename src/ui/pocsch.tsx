@@ -3,7 +3,7 @@ import './pocsch.less';
 import Auth from '../model/auth';
 import ServiceMap from '../model/service-map';
 import Home from './home';
-import { BrowserRouter, HashRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 

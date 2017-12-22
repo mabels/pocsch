@@ -41,7 +41,7 @@ function deployJsFrontend(basename: string): BlueBird<string> {
 }
 
 import * as crypto from 'crypto';
-import { Promise } from 'bluebird';
+// import { Promise } from 'bluebird';
 
 function findService(so: string): void {
   const ymlStr: string[] = [];
@@ -98,7 +98,7 @@ export function deployServerLess(): void {
         serviceMap.prod[i] = serviceMap.prod[i] || [];
         serviceMap.prod[i].push(findService(stdout));
         let count = 0;
-        for (let j in serviceMap.prod) {
+        for (let __ in serviceMap.prod) {
           count++;
         }
         if (count >= arr.length) {

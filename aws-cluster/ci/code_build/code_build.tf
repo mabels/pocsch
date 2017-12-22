@@ -38,6 +38,49 @@ resource "aws_iam_policy" "codebuild_policy" {
         "logs:CreateLogStream",
         "logs:PutLogEvents"
       ]
+    },
+    {
+      "Sid": "CodeCommitPolicy",
+      "Effect": "Allow",
+      "Action": [
+        "codecommit:GitPull"
+      ],
+      "Resource": [
+        "*"
+      ]
+    },
+    {
+      "Sid": "S3GetObjectPolicy",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:GetObjectVersion"
+      ],
+      "Resource": [
+        "*"
+      ]
+    },
+    {
+      "Sid": "S3PutObjectPolicy",
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject"
+      ],
+      "Resource": [
+        "*"
+      ]
+    },
+    {
+      "Action": [
+        "ecr:GetRepositoryPolicy",
+        "ecr:SetRepositoryPolicy",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:BatchGetImage",
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:GetAuthorizationToken"
+      ],
+      "Resource": "*",
+      "Effect": "Allow"
     }
   ]
 }
