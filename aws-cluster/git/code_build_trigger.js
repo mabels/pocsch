@@ -24,7 +24,7 @@ exports.handler = function(event, context) {
             console.log('Clone URL:', data.repositoryMetadata.cloneUrlHttp);
             console.log('repositoryMetadata:', data.repositoryMetadata);
             const build = {
-              'projectName': `codebuild-project-${data.repositoryName}`,
+              'projectName': `codebuild-project-${data.repositoryMetadata.repositoryName}`,
               'sourceVersion': event.Records[0].codecommit.references[0].commit
             }
             console.log('Build', build);
