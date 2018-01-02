@@ -179,9 +179,8 @@ resource "aws_iam_role_policy" "code_build_trigger_role_exec" {
 EOF
 }
 
-#resource "aws_iam_role_policy" "code_build_trigger_role_gitaccess" {
-#  name = "code_build_trigger_role_gitaccess"
-#  role = "${aws_iam_role.code_build_trigger_role.id}"
-#  policy = "${data.aws_iam_policy_document.GitReproPolicyDocument.json}"
-#}
+resource "aws_iam_role_policy_attachment" "code_build_trigger_role_gitaccess_attach" {
+    role       = "${aws_iam_role.code_build_trigger_role.name}"
+    policy_arn = "arn:aws:iam::aws:policy/AWSCodeCommitFullAccess"
+}
 
