@@ -25,11 +25,14 @@ exports.handler = function(event, context) {
             //context.succeed(data.repositoryMetadata.cloneUrlHttp);
             const build = {
               'projectName': `codebuild-project-${data.repositoryName}`,
-              // 'sourceVersion': event['Records'][0]['codecommit']['references'][0]['commit']
+              'sourceVersion': event.Records[0].codecommit.references[0].commit
             }
             console.log('Build', build);
-            //console('Starting build for project {0} from commit ID {1}'.format(build['projectName'], build['sourceVersion']))
-            // codebuild.start_build(**build)
+            codebuild.startBuild(build, function(err, data) {
+              if (err) console.log(err, err.stack); // an error occurred
+              else     console.log(data);           // successful response
+              context.succeed('codebuild-triggered:', build);
+            });
         }
     });
 
