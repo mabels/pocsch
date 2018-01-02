@@ -255,18 +255,15 @@ resource "aws_codebuild_project" "code_build" {
   artifacts {
     type = "NO_ARTIFACTS"
   }
-# 
    environment {
      compute_type = "BUILD_GENERAL1_SMALL"
      image        = "2"
      type         = "LINUX_CONTAINER"
    }
-# 
    source {
      type     = "CODECOMMIT"
      location = "https://git-codecommit.eu-west-1.amazonaws.com/v1/repos/${lookup(var.git_repros[count.index], "name")}"
    }
  
  }
-# 
-# 
+
