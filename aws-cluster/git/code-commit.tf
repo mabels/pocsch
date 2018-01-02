@@ -27,6 +27,12 @@ variable "git_users" {
   }
 }
 
+
+resource "aws_ecr_repository" "pocsch_ecr_repros" {
+  count = "${length(var.git_repros)}"
+  name = "${lookup(var.git_repros[count.index], "name")}"
+}
+
 resource "aws_codecommit_repository" "git_repos" {
   count = "${length(var.git_repros)}"
   repository_name = "${lookup(var.git_repros[count.index], "name")}"
@@ -177,6 +183,11 @@ resource "aws_iam_role_policy_attachment" "code_build_trigger_role_gitaccess_att
 
 resource "aws_iam_role_policy_attachment" "code_build_trigger_role_code_build" {
     role       = "${aws_iam_role.code_build_trigger_role.name}"
+    policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
+}
+
+resource "aws_iam_role_policy_attachment" "code_build_trigger_role_ecr" {
+    role       = "${aws_iam_role.code_build_trigger_role.name}"
     policy_arn = "arn:aws:iam::aws:policy/AWSCodeBuildAdminAccess"
 }
 
@@ -192,7 +203,8 @@ resource "aws_codebuild_project" "code_build" {
   }
    environment {
      compute_type = "BUILD_GENERAL1_SMALL"
-     image        = "2"
+     image        = "aws/codebuild/docker:17.09.0"
+     privileged_mode = true
      type         = "LINUX_CONTAINER"
    }
    source {
@@ -200,7 +212,7 @@ resource "aws_codebuild_project" "code_build" {
      location = "https://git-codecommit.eu-west-1.amazonaws.com/v1/repos/${lookup(var.git_repros[count.index], "name")}"
    }
 
-  depends_on = ["aws_iam_role_policy_attachment.code_build_trigger_role_code_build"]
+  #depends_on = ["aws_iam_role_policy_attachment.code_build_trigger_role_code_build"]
 
  
  }

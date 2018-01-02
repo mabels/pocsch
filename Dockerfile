@@ -4,8 +4,7 @@ COPY webpack.config.js tsconfig.json tslint.json package.json /app/
 COPY test /app/test
 COPY src /app/src
 RUN cd app && \
-  ls -l && \
-  npm install && \
+  npm install --quiet && \
   npm run lint && \
   npm test && \
   npm run build
