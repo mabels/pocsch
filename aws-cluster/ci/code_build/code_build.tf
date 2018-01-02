@@ -74,6 +74,8 @@ resource "aws_iam_policy" "codebuild_policy" {
       "Action": [
         "ecr:GetRepositoryPolicy",
         "ecr:SetRepositoryPolicy",
+        "ecr:InitiateLayerUpload",
+        "ecr:UploadLayerPart",
         "ecr:GetDownloadUrlForLayer",
         "ecr:BatchGetImage",
         "ecr:BatchCheckLayerAvailability",

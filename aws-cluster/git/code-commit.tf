@@ -5,10 +5,10 @@ variable "git_repros" {
       name = "pocsch"
       description = "description pocsch-git"
     },
-    {
-      name = "pocsch-0"
-      description = "description pocsch-0-git"
-    }
+#    {
+#      name = "pocsch-0"
+#      description = "description pocsch-0-git"
+#    }
   ]
 }
 
@@ -91,4 +91,56 @@ resource "aws_iam_group_membership" "GitReproAddGroup" {
   depends_on = ["aws_iam_user.GitReproUsers", "aws_iam_group.GitReproGroups"]
 }
 
+resource "aws_lambda_permission" "code_build_trigger_perm" {
+  count = "${length(var.git_repros)}"
+  statement_id   = "AllowCodeBuildTriggerPerm"
+  action         = "lambda:InvokeFunction"
+  function_name  = "${aws_lambda_function.code_build_trigger.function_name}"
+  principal      = "codecommit.amazonaws.com"
+  #source_account = "${aws_codecommit_repository.git_repos.*.repository_id[count.index]}"
+  source_arn     = "${aws_codecommit_repository.git_repos.*.arn[count.index]}"
+  #source_account = "${lookup(aws_codecommit_repository.git_repos[count.index], "repository_id")}"
+  #source_arn     = "${lookup(aws_codecommit_repository.git_repos[count.index], "arn")}"
+}
 
+
+resource "aws_lambda_function" "code_build_trigger" {
+  filename         = "code_build_trigger.zip"
+  function_name    = "code_build_tigger"
+  role             = "${aws_iam_role.code_build_trigger_role.arn}"
+  handler          = "exports.handler"
+  source_code_hash = "${base64sha256(file("code_build_trigger.zip"))}"
+  runtime          = "nodejs6.10"
+}
+
+resource "aws_codecommit_trigger" "git_repos" {
+  depends_on      = ["aws_codecommit_repository.git_repos"]
+  repository_name = "${lookup(var.git_repros[count.index], "name")}"
+
+  trigger {
+    name            = "code_build_tigger"
+    events          = ["all"]
+    destination_arn = "${aws_lambda_function.code_build_trigger.arn}"
+  }
+}
+
+
+resource "aws_iam_role" "code_build_trigger_role" {
+  name = "code_build_trigger_role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
