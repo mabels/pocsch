@@ -20,10 +20,10 @@ variable "git_users" {
       name = "posch-user-1"
       ssh  = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDIQpC2scaVXEaNuwtq4n6Vtht2WHYxtDFKe44JNFEsZGyQjyL9c2qkmQQGCF+2g3HrIPDTCCCWQ3GUiXGAlQ0/rf6sLqcm4YMXt+hgHU5VeciUIDEySCKdCPC419wFPBw6oKdcN1pLoIdWoF4LRDcjcrKKAlkdNJ/oLnl716piLdchABO9NXGxBpkLsJGK8qw390O1ZqZMe9wEAL9l/A1/49v8LfzELp0/fhSmiXphTVI/zNVIp/QIytXzRg74xcYpBjHk1TQZHuz/HYYsWwccnu7vYaTDX0CCoAyEt599f9u+JQ4oW0qyLO0ie7YcmR6nGEW4DMsPcfdqqo2VyYy4ix3U5RI2JcObfP0snYwPtAdVeeeReXi3c/E7bGLeCcwdFeFBfHSA9PDGxWVlxh/oCJaE7kP7eBhXNjN05FodVdNczKI5T9etfQ9VHILFrvpEREg1+OTiI58RmwjxS5ThloqXvr/nZzhIwTsED0KNW8wE4pjyotDJ8jaW2d7oVIMdWqE2M9Z1sLqDDdhHdVMFxk6Hl2XfqeqO2Jnst7qzbHAN/S3hvSwysixWJEcLDVG+cg1KRwz4qafCU5oHSp8aNNOk4RZozboFjac17nOmfPfnjC/LLayjSkEBZ+eFi+njZRLDN92k3PvHYFEB3USbHYzICsuDcf+L4cslX03g7w== openpgp:0x5F1BE34D"
     }
-    "1" = {
-      name = "posch-user-2"
-      ssh  = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDIQpC2scaVXEaNuwtq4n6Vtht2WHYxtDFKe44JNFEsZGyQjyL9c2qkmQQGCF+2g3HrIPDTCCCWQ3GUiXGAlQ0/rf6sLqcm4YMXt+hgHU5VeciUIDEySCKdCPC419wFPBw6oKdcN1pLoIdWoF4LRDcjcrKKAlkdNJ/oLnl716piLdchABO9NXGxBpkLsJGK8qw390O1ZqZMe9wEAL9l/A1/49v8LfzELp0/fhSmiXphTVI/zNVIp/QIytXzRg74xcYpBjHk1TQZHuz/HYYsWwccnu7vYaTDX0CCoAyEt599f9u+JQ4oW0qyLO0ie7YcmR6nGEW4DMsPcfdqqo2VyYy4ix3U5RI2JcObfP0snYwPtAdVeeeReXi3c/E7bGLeCcwdFeFBfHSA9PDGxWVlxh/oCJaE7kP7eBhXNjN05FodVdNczKI5T9etfQ9VHILFrvpEREg1+OTiI58RmwjxS5ThloqXvr/nZzhIwTsED0KNW8wE4pjyotDJ8jaW2d7oVIMdWqE2M9Z1sLqDDdhHdVMFxk6Hl2XfqeqO2Jnst7qzbHAN/S3hvSwysixWJEcLDVG+cg1KRwz4qafCU5oHSp8aNNOk4RZozboFjac17nOmfPfnjC/LLayjSkEBZ+eFi+njZRLDN92k3PvHYFEB3USbHYzICsuDcf+L4cslX03g7w== openpgp:0x5F1BE34D"
-    }
+#    "1" = {
+#      name = "posch-user-2"
+#      ssh  = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDIQpC2scaVXEaNuwtq4n6Vtht2WHYxtDFKe44JNFEsZGyQjyL9c2qkmQQGCF+2g3HrIPDTCCCWQ3GUiXGAlQ0/rf6sLqcm4YMXt+hgHU5VeciUIDEySCKdCPC419wFPBw6oKdcN1pLoIdWoF4LRDcjcrKKAlkdNJ/oLnl716piLdchABO9NXGxBpkLsJGK8qw390O1ZqZMe9wEAL9l/A1/49v8LfzELp0/fhSmiXphTVI/zNVIp/QIytXzRg74xcYpBjHk1TQZHuz/HYYsWwccnu7vYaTDX0CCoAyEt599f9u+JQ4oW0qyLO0ie7YcmR6nGEW4DMsPcfdqqo2VyYy4ix3U5RI2JcObfP0snYwPtAdVeeeReXi3c/E7bGLeCcwdFeFBfHSA9PDGxWVlxh/oCJaE7kP7eBhXNjN05FodVdNczKI5T9etfQ9VHILFrvpEREg1+OTiI58RmwjxS5ThloqXvr/nZzhIwTsED0KNW8wE4pjyotDJ8jaW2d7oVIMdWqE2M9Z1sLqDDdhHdVMFxk6Hl2XfqeqO2Jnst7qzbHAN/S3hvSwysixWJEcLDVG+cg1KRwz4qafCU5oHSp8aNNOk4RZozboFjac17nOmfPfnjC/LLayjSkEBZ+eFi+njZRLDN92k3PvHYFEB3USbHYzICsuDcf+L4cslX03g7w== openpgp:0x5F1BE34D"
+#    }
   }
 }
 
@@ -36,7 +36,19 @@ resource "aws_codecommit_repository" "git_repos" {
 data "aws_iam_policy_document" "GitReproPolicyDocument" {
   statement {
     actions = [
-      "aws:policy/AWSCodeCommitFullAccess"
+                "codecommit:BatchGet*",
+                "codecommit:Get*",
+                "codecommit:List*",
+                "codecommit:Create*",
+                "codecommit:DeleteBranch",
+                "codecommit:Describe*",
+                "codecommit:Put*",
+                "codecommit:Post*",
+                "codecommit:Merge*",
+                "codecommit:Test*",
+                "codecommit:Update*",
+                "codecommit:GitPull",
+                "codecommit:GitPush"
     ]
     resources = [
       "${aws_codecommit_repository.git_repos.*.arn}"
@@ -56,7 +68,6 @@ resource "aws_iam_group_policy" "GitReproGroupsPolicy" {
   name  = "git-${lookup(var.git_repros[count.index], "name")}"
   group = "git-${lookup(var.git_repros[count.index], "name")}"
   policy = "${data.aws_iam_policy_document.GitReproPolicyDocument.json}"
-  depends_on = ["aws_iam_group.GitReproGroups"]
 }
 
 resource "aws_iam_user" "GitReproUsers" {
@@ -91,7 +102,7 @@ resource "aws_iam_group_membership" "GitReproAddGroup" {
   depends_on = ["aws_iam_user.GitReproUsers", "aws_iam_group.GitReproGroups"]
 }
 
-resource "aws_lambda_permission" "code_build_trigger_perm" {
+resource "aws_lambda_permission" "code_build_trigger_perm_invoke" {
   count = "${length(var.git_repros)}"
   statement_id   = "AllowCodeBuildTriggerPerm"
   action         = "lambda:InvokeFunction"
@@ -103,12 +114,11 @@ resource "aws_lambda_permission" "code_build_trigger_perm" {
   #source_arn     = "${lookup(aws_codecommit_repository.git_repos[count.index], "arn")}"
 }
 
-
 resource "aws_lambda_function" "code_build_trigger" {
   filename         = "code_build_trigger.zip"
-  function_name    = "code_build_tigger"
+  function_name    = "code_build_trigger"
   role             = "${aws_iam_role.code_build_trigger_role.arn}"
-  handler          = "exports.handler"
+  handler          = "code_build_trigger.handler"
   source_code_hash = "${base64sha256(file("code_build_trigger.zip"))}"
   runtime          = "nodejs6.10"
 }
@@ -118,11 +128,12 @@ resource "aws_codecommit_trigger" "git_repos" {
   repository_name = "${lookup(var.git_repros[count.index], "name")}"
 
   trigger {
-    name            = "code_build_tigger"
+    name            = "code_build_trigger"
     events          = ["all"]
     destination_arn = "${aws_lambda_function.code_build_trigger.arn}"
   }
 }
+
 
 
 resource "aws_iam_role" "code_build_trigger_role" {
@@ -144,3 +155,33 @@ resource "aws_iam_role" "code_build_trigger_role" {
 }
 EOF
 }
+
+resource "aws_iam_role_policy" "code_build_trigger_role_exec" {
+  name = "code_build_trigger_role_exec"
+  role = "${aws_iam_role.code_build_trigger_role.id}"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": [
+        "arn:aws:logs:*:*:*"
+      ]
+    }
+  ]
+}
+EOF
+}
+
+#resource "aws_iam_role_policy" "code_build_trigger_role_gitaccess" {
+#  name = "code_build_trigger_role_gitaccess"
+#  role = "${aws_iam_role.code_build_trigger_role.id}"
+#  policy = "${data.aws_iam_policy_document.GitReproPolicyDocument.json}"
+#}
+
