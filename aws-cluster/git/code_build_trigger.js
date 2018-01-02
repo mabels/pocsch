@@ -1,5 +1,6 @@
 var aws = require('aws-sdk');
 var codecommit = new aws.CodeCommit({ apiVersion: '2015-04-13' });
+var codebuild = new aws.CodeBuild();
 
 exports.handler = function(event, context) {
     
@@ -20,7 +21,15 @@ exports.handler = function(event, context) {
             context.fail(message);
         } else {
             console.log('Clone URL:', data.repositoryMetadata.cloneUrlHttp);
-            context.succeed(data.repositoryMetadata.cloneUrlHttp);
+            //context.succeed(data.repositoryMetadata.cloneUrlHttp);
+            const build = {
+              'projectName': event['Records'][0]['customData'],
+              'sourceVersion': event['Records'][0]['codecommit']['references'][0]['commit']
+            }
+            console('Starting build for project {0} from commit ID {1}'.format(build['projectName'], build['sourceVersion']))
+            cb.start_build(**build)
         }
     });
+
+
 };
