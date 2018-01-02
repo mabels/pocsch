@@ -139,7 +139,8 @@ resource "aws_codecommit_trigger" "git_repos" {
 
 
 resource "aws_iam_role" "code_build_trigger_role" {
-  name = "code_build_trigger_role"
+   count = "${length(var.git_repros)}"
+   name = "codebuilder-for-${lookup(var.git_repros[count.index], "name")}"
 
   assume_role_policy = <<EOF
 {
@@ -150,35 +151,23 @@ resource "aws_iam_role" "code_build_trigger_role" {
       "Principal": {
         "Service": "lambda.amazonaws.com"
       },
-      "Effect": "Allow",
-      "Sid": ""
+      "Effect": "Allow"
+    },
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "codebuild.amazonaws.com"
+      },
+      "Effect": "Allow"
     }
   ]
 }
 EOF
 }
 
-resource "aws_iam_role_policy" "code_build_trigger_role_exec" {
-  name = "code_build_trigger_role_exec"
-  role = "${aws_iam_role.code_build_trigger_role.id}"
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ],
-      "Resource": [
-        "arn:aws:logs:*:*:*"
-      ]
-    }
-  ]
-}
-EOF
+resource "aws_iam_role_policy_attachment" "code_build_trigger_role_logs" {
+    role       = "${aws_iam_role.code_build_trigger_role.name}"
+    policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
 }
 
 resource "aws_iam_role_policy_attachment" "code_build_trigger_role_gitaccess_attach" {
@@ -186,63 +175,9 @@ resource "aws_iam_role_policy_attachment" "code_build_trigger_role_gitaccess_att
     policy_arn = "arn:aws:iam::aws:policy/AWSCodeCommitFullAccess"
 }
 
-
-#----------
-
-resource "aws_iam_role" "codebuild_role" {
-  count = "${length(var.git_repros)}"
-  name = "codebuild-role-${lookup(var.git_repros[count.index], "name")}"
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "codebuild.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_policy" "codebuild_policy" {
-  name        = "codebuild-policy"
-  path        = "/service-role/"
-  description = "Policy used in trust relationship with CodeBuild"
-
-  policy = <<POLICY
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Resource": [
-        "*"
-      ],
-      "Action": [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ]
-    }
-  ]
-}
-POLICY
-}
-
-resource "aws_iam_policy_attachment" "codebuild_policy_attachment" {
-  name       = "codebuild_policy_attachment"
-  policy_arn = "${aws_iam_policy.codebuild_policy.arn}"
-  roles      = ["${aws_iam_role.codebuild_role.*.id}"]
-}
-
-resource "aws_iam_role_policy_attachment" "code_build_role_gitaccess_attach" {
-   count = "${length(var.git_repros)}"
-    role       = "${aws_iam_role.codebuild_role.*.name[count.index]}"
-    policy_arn = "arn:aws:iam::aws:policy/AWSCodeCommitFullAccess"
+resource "aws_iam_role_policy_attachment" "code_build_trigger_role_code_build" {
+    role       = "${aws_iam_role.code_build_trigger_role.name}"
+    policy_arn = "arn:aws:iam::aws:policy/AWSCodeBuildAdminAccess"
 }
 
 resource "aws_codebuild_project" "code_build" {
@@ -250,7 +185,7 @@ resource "aws_codebuild_project" "code_build" {
    name = "codebuild-project-${lookup(var.git_repros[count.index], "name")}"
    description  = "codebuild-project-${lookup(var.git_repros[count.index], "name")}"
   build_timeout      = "5"
-  service_role = "${aws_iam_role.codebuild_role.*.arn[count.index]}"
+  service_role = "${aws_iam_role.code_build_trigger_role.*.arn[count.index]}"
  
   artifacts {
     type = "NO_ARTIFACTS"
@@ -264,6 +199,9 @@ resource "aws_codebuild_project" "code_build" {
      type     = "CODECOMMIT"
      location = "https://git-codecommit.eu-west-1.amazonaws.com/v1/repos/${lookup(var.git_repros[count.index], "name")}"
    }
+
+  depends_on = ["aws_iam_role_policy_attachment.code_build_trigger_role_code_build"]
+
  
  }
 
