@@ -22,7 +22,7 @@ exports.handler = function(event, context) {
             context.fail(message);
         } else {
             console.log('Clone URL:', data.repositoryMetadata.cloneUrlHttp);
-            //context.succeed(data.repositoryMetadata.cloneUrlHttp);
+            console.log('repositoryMetadata:', data.repositoryMetadata);
             const build = {
               'projectName': `codebuild-project-${data.repositoryName}`,
               'sourceVersion': event.Records[0].codecommit.references[0].commit
