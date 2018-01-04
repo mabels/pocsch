@@ -6,8 +6,8 @@
 #  asg_regions = ["eu-west-1b"]
 #}
 
-module "ecs_stage" {
-  source = "./ecs-cluster"
-  name = "stage"
-}
+#module "ecs_stage" {
+#  source = "./ecs-cluster"
+#  name = "stage"
+#}
 
