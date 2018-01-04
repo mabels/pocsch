@@ -148,17 +148,17 @@ resource "aws_iam_role" "code_build_trigger_role" {
    count = "${length(var.git_repros)}"
    name = "codebuilder-for-${lookup(var.git_repros[count.index], "name")}"
 
+    #{
+    #  "Action": "sts:AssumeRole",
+    #  "Principal": {
+    #    "Service": "lambda.amazonaws.com"
+    #  },
+    #  "Effect": "Allow"
+    #},
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Effect": "Allow"
-    },
     {
       "Action": "sts:AssumeRole",
       "Principal": {
@@ -199,7 +199,7 @@ resource "aws_codebuild_project" "code_build" {
   service_role = "${aws_iam_role.code_build_trigger_role.*.arn[count.index]}"
  
   artifacts {
-    type = "NO_ARTIFACTS"
+    type = "CODEPIPELINE"
   }
    environment {
      compute_type = "BUILD_GENERAL1_SMALL"

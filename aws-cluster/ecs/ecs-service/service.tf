@@ -398,3 +398,107 @@ resource "aws_security_group_rule" "lbaccess" {
   source_security_group_id = "${aws_security_group.ecsSecurityAlb.id}"
   security_group_id = "${aws_security_group.ec2ssh.id}"
 }
+
+
+resource "aws_iam_role" "ecsCodeDeployRole" {
+  name = "ecs-cd-role-${var.project_name}-${var.service_name}"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "codedeploy.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "ecsCodeDeployRole" {
+  name = "ecs-cd-role-policy-${var.project_name}-${var.service_name}"
+  role = "${aws_iam_role.ecsCodeDeployRole.id}"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "autoscaling:CompleteLifecycleAction",
+        "autoscaling:DeleteLifecycleHook",
+        "autoscaling:DescribeAutoScalingGroups",
+        "autoscaling:DescribeLifecycleHooks",
+        "autoscaling:PutLifecycleHook",
+        "autoscaling:RecordLifecycleActionHeartbeat",
+        "codedeploy:*",
+        "ec2:DescribeInstances",
+        "ec2:DescribeInstanceStatus",
+        "tag:GetTags",
+        "tag:GetResources",
+        "sns:Publish"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
+
+resource "aws_codedeploy_deployment_config" "ecsCluster" {
+  deployment_config_name = "cdc-${aws_codedeploy_app.ecsCluster.name}"
+
+  minimum_healthy_hosts {
+    type  = "HOST_COUNT"
+    value = "${var.min_size}"
+  }
+}
+
+resource "aws_codedeploy_deployment_group" "ecsCluster" {
+  app_name               = "${aws_codedeploy_app.ecsCluster.name}"
+  deployment_group_name  = "dg-${var.project_name}-${var.service_name}"
+  service_role_arn       = "${aws_iam_role.ecsCodeDeployRole.arn}"
+  deployment_config_name = "${aws_codedeploy_deployment_config.ecsCluster.id}"
+  autoscaling_groups = ["${aws_autoscaling_group.ecsServiceAutoScaling.name}"]
+
+
+ deployment_style {
+    deployment_option = "WITH_TRAFFIC_CONTROL"
+    deployment_type   = "BLUE_GREEN"
+  }
+
+  load_balancer_info {
+    #elb_info {
+    # name = "${aws_lb.ecsAlb.name}"
+    #
+    target_group_info {
+      name = "${aws_lb_target_group.ecsAlb.name}"
+    }
+  }
+
+  blue_green_deployment_config {
+    deployment_ready_option {
+      action_on_timeout    = "STOP_DEPLOYMENT"
+      wait_time_in_minutes = 60
+    }
+
+    green_fleet_provisioning_option {
+      action = "DISCOVER_EXISTING"
+    }
+
+    terminate_blue_instances_on_deployment_success {
+      action = "KEEP_ALIVE"
+    }
+  }
+}
+
+resource "aws_codedeploy_app" "ecsCluster" {
+  name = "cd-${var.project_name}-${var.service_name}"
+}
