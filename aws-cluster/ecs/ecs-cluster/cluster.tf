@@ -5,19 +5,19 @@ variable "min_size" {
 variable "max_size" {
   default = 1
 }
-variable "services" {}
+#variable "services" {}
 variable "instance_type" {
   type = "string"
   default = "t2.micro"
 }
 
-variable "asg_regions" {
-  type = "list"
-}
+#variable "asg_regions" {
+#  type = "list"
+#}
 
 resource "aws_vpc" "ecsClusterVpc" {
   cidr_block       = "10.0.0.0/16"
-  tags { Name = "vpc-${var.name}" }
+  tags { Name = "ecs-vpc-${var.name}" }
 }
 
 #resource "aws_eip" "ecsEip" {
@@ -45,16 +45,20 @@ resource "aws_vpc" "ecsClusterVpc" {
 resource "aws_internet_gateway" "ecsInternetGateway" {
     vpc_id = "${aws_vpc.ecsClusterVpc.id}"
     tags {
-        Name        = "igy-${var.name}"
+        Name        = "ecs-igy-${var.name}"
         Environment = "${var.name}"
     }
 }
 
+data "aws_availability_zones" "available" {
+}
 
 resource "aws_subnet" "ecsCLusterSubNet" {
-  cidr_block       = "10.0.1.0/24"
+  count = "${length(data.aws_availability_zones.available.names)}"
+  availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
+  cidr_block       = "10.0.${count.index}.0/24"
   vpc_id = "${aws_vpc.ecsClusterVpc.id}"
-  tags { Name = "subnet-${var.name}" }
+  tags { Name = "ecs-sn-${var.name}-${count.index}" }
   depends_on = ["aws_vpc.ecsClusterVpc"]
 }
 
@@ -63,21 +67,28 @@ data "aws_subnet_ids" "byVpc" {
   depends_on = ["aws_subnet.ecsCLusterSubNet"]
 }
 
-data "aws_route_table" "bySubnet" {
+resource "aws_route_table" "ecsDefaultGw" {
   vpc_id = "${aws_vpc.ecsClusterVpc.id}"
-  #subnet_id = "${aws_subnet.ecsCLusterSubNet.id}"
-  depends_on = ["aws_subnet.ecsCLusterSubNet"]
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = "${aws_internet_gateway.ecsInternetGateway.id}"
+  }
+
+  tags {
+    Name = "rt-dt-${aws_vpc.ecsClusterVpc.id}"
+  }
 }
 
-resource "aws_route" "ecsDefaultRoute" {
-  #vpc_id = "${aws_vpc.ecsClusterVpc.id}"
+resource "aws_main_route_table_association" "ecsDefaultGw" {
+  vpc_id = "${aws_vpc.ecsClusterVpc.id}"
+  route_table_id = "${aws_route_table.ecsDefaultGw.id}"
+}
 
-  route_table_id            = "${data.aws_route_table.bySubnet.id}"
-  destination_cidr_block    = "0.0.0.0/0"
-  gateway_id = "${aws_internet_gateway.ecsInternetGateway.id}"
-  #tags {
-  #  Name        = "ecsDefaultRoute-${var.name}"
-  #}
+resource "aws_route_table_association" "ecsDefaultGw" {
+  count = "${length(data.aws_availability_zones.available.names)}"
+  subnet_id = "${aws_subnet.ecsCLusterSubNet.*.id[count.index]}"
+  route_table_id = "${aws_route_table.ecsDefaultGw.id}"
 }
 
 
@@ -90,15 +101,6 @@ data "aws_ami" "EcsAmi" {
   most_recent      = true
 }
 
-
-
-resource "aws_security_group" "ecsSecurity" {
-  name       = "node-sg-${var.name}"
-#  vpc_id     = "${aws_vpc.ecsClusterVpc.id}"
-  tags {
-    Name        = "ecsSecurity-${var.name}"
-  }
-}
 
 
 resource "aws_iam_role" "ecsAsgRole" {
@@ -164,6 +166,32 @@ resource "aws_iam_instance_profile" "ecsAsgRole" {
   #}
 }
 
+resource "aws_security_group" "ec2ssh" {
+  name       = "node-sg-ssh"
+  vpc_id     = "${aws_vpc.ecsClusterVpc.id}"
+  tags {
+    Name        = "ec2-sy-ssh"
+  }
+}
+
+resource "aws_security_group_rule" "ec2ssh" {
+  type            = "ingress"
+  from_port       = 22
+  to_port         = 22
+  protocol        = "tcp"
+  cidr_blocks     = ["0.0.0.0/0"]
+  security_group_id = "${aws_security_group.ec2ssh.id}"
+}
+
+resource "aws_security_group_rule" "outboundAll" {
+  type            = "egress"
+  from_port       = 0
+  to_port         = 65535
+  protocol        = "all"
+  cidr_blocks     = ["0.0.0.0/0"]
+  security_group_id = "${aws_security_group.ec2ssh.id}"
+}
+
 
 resource "aws_launch_configuration" "ecsService" {
   name_prefix          = "ecs-cluster-${var.name}-"
@@ -178,7 +206,7 @@ echo ECS_CLUSTER=${aws_ecs_cluster.ecsService.name} >> /etc/ecs/ecs.config
 EOF
 #  vpc_classic_link_id  = "${aws_vpc.ecsClusterVpc.id}"
 #  vpc_classic_link_security_groups = ["${aws_security_group.ecsSecurity.id}"]
-#  security_groups      = ["${aws_security_group.ecsSecurity.id}"]
+  security_groups      = ["${aws_security_group.ec2ssh.id}"]
   lifecycle {
     create_before_destroy = true
   }
@@ -195,7 +223,7 @@ resource "aws_autoscaling_group" "ecsServiceAutoScaling" {
   # availability_zones        = "${var.asg_regions}"
   name                 = "ecs-auto-scaling-cluster-${var.name}"
   launch_configuration = "${aws_launch_configuration.ecsService.name}"
-  vpc_zone_identifier  = ["${aws_subnet.ecsCLusterSubNet.id}"]
+  vpc_zone_identifier  = ["${aws_subnet.ecsCLusterSubNet.*.id}"]
   min_size             = "${var.min_size}"
   max_size             = "${var.max_size}"
   depends_on = ["aws_launch_configuration.ecsService"]
@@ -211,3 +239,26 @@ resource "aws_autoscaling_group" "ecsServiceAutoScaling" {
 resource "aws_ecs_cluster" "ecsService" {
   name = "ecs-cluster-${var.name}"
 }
+
+data "aws_iam_policy_document" "alb_logs" {
+  statement {
+    effect = "Allow"
+    principals = {
+      type =  "AWS"
+      identifiers = [ "arn:aws:iam::156460612806:root" ]
+    },
+    actions = [ "s3:PutObject" ]
+    resources = [ "arn:aws:s3:::ecs-alb-${var.name}-logs/*" ]
+  }
+}
+
+resource "aws_s3_bucket" "alb_logs" {
+  bucket = "ecs-alb-${var.name}-logs"
+  acl    = "private"
+  policy = "${data.aws_iam_policy_document.alb_logs.json}"
+  tags {
+    Name        = "ecs-alb-${var.name}-logs"
+    Environment = "${var.name}"
+  }
+}
+
