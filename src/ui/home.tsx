@@ -21,7 +21,7 @@ export default class Home extends React.Component<HomeProps, HomeState> {
     return <Navbar fluid>
           <Navbar.Header>
             <Navbar.Brand>
-              <a href="#">POCSCH</a>
+              <a href="#">POCSCH:</a>
             </Navbar.Brand>
             {
               !this.props.auth.authenticated && (
